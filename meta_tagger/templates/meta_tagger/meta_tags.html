@@ -1,0 +1,16 @@
+{% load meta_tagger_tags %}
+
+{% render_description_meta_tag %}
+{% render_global_meta_tag 'author' %}
+{% render_global_meta_tag 'publisher' %}
+{% render_global_meta_tag 'copyright' %}
+{% render_global_meta_tag 'company' %}
+{% render_robots_meta_tag %}
+
+{# open-graph tags #}
+{% render_title_tag True %}
+{% render_description_meta_tag True %}
+{% render_image_meta_tag %}
+{% render_global_meta_tag 'site_name' True %}
+{% render_global_meta_tag 'type' True %}
+<meta property="og:url" content="{{ request.build_absolute_uri }}">
