@@ -39,7 +39,10 @@ def render_title_tag(context, is_og=False):
 
     # Try to get the title from the context object (e.g. DetailViews).
     if context.get('object'):
-        content = getattr(context['object'], 'meta_title', None)
+        try:
+            content = context['object'].get_meta_title()
+        except AttributeError:
+            pass
 
     if not content:
         # Try to get the title from the cms page.
@@ -66,7 +69,10 @@ def render_description_meta_tag(context, is_og=False):
 
     # Try to get the description from the context object (e.g. DetailViews).
     if context.get('object'):
-        content = getattr(context['object'], 'meta_description', None)
+        try:
+            content = context['object'].get_meta_description()
+        except AttributeError:
+            pass
 
     if not content:
         try:
@@ -91,21 +97,26 @@ def render_robots_meta_tag(context):
     Returns the robots meta tag.
     """
     request = context['request']
-    robots_indexing = False
-    robots_following = False
+    robots_indexing = None
+    robots_following = None
 
     if not settings.DEBUG:
-        try:
-            # Try to get the description from the context object (e.g. DetailView).
-            robots_indexing = getattr(context['object'], 'robots_indexing', None)
-            robots_following = getattr(context['object'], 'robots_following', None)
-        except KeyError:
+        # Try to get the title from the context object (e.g. DetailViews).
+        if context.get('object'):
             try:
-                # Try fetching the robots values of the cms page.
-                robots_indexing = request.current_page.metatagpageextension.robots_indexing
-                robots_following = request.current_page.metatagpageextension.robots_following
-            except MetaTagPageExtension.DoesNotExist:
+                robots_indexing = context['object'].get_robots_indexing()
+                robots_following = context['object'].get_robots_following()
+            except AttributeError:
                 pass
+
+        try:
+            # Try fetching the robots values of the cms page.
+            if robots_indexing is None:
+                robots_indexing = request.current_page.metatagpageextension.robots_indexing
+            if robots_following is None:
+                robots_following = request.current_page.metatagpageextension.robots_following
+        except MetaTagPageExtension.DoesNotExist:
+            pass
 
     return '<meta name="robots" content="{robots_indexing}, {robots_following}">'.format(
         robots_indexing='index' if robots_indexing else 'noindex',
@@ -120,7 +131,10 @@ def render_image_meta_tag(context):
 
     # Try to get the image from the context object (e.g. DetailView).
     if context.get('object'):
-        og_image = getattr(context['object'], 'og_image', None)
+        try:
+            og_image = context['object'].get_og_image()
+        except AttributeError:
+            pass
 
     if not og_image:
         try:

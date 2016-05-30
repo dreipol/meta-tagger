@@ -61,10 +61,15 @@ Features
 
 Model mixin
 -----------
-The ``MetaTagMixin`` is helpful to customize the meta tags of your own Django apps. The usage is straightforward like
+This package provides several mixins for the models of your own Django apps. The usage of
+``MetaTagTitleDescriptionMixin``, ``OpenGraphMixin``, ``RobotsMixin`` is straightforward like
 any other mixin. If your view has a context variable called ``object``, which is the default value for the class based
 generic ``DetailView``, you don't need to consider anything. Otherwise just pass the object as context to your view.
+
 Make sure you don't forget to implement your translation settings before you create your migrations.
+
+You might want to use one of your own model fields as meta title. By overriding the corresponding method
+(e.g. get_meta_title), it is very easy to provide another value.
 
 
 Static settings
