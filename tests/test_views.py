@@ -3,6 +3,7 @@
 from cms.api import create_page
 from cms.test_utils.testcases import CMSTestCase
 from django.core.urlresolvers import reverse
+from django.test import override_settings
 from pyquery import PyQuery
 from tests.sample_app.models import NewsArticle
 
@@ -115,6 +116,15 @@ class PageMetaTagTests(MetaTaggerViewTestMixin):
         content = PyQuery(response.content)
         self.assertEqual(content.find('meta[name="description"]').attr('content'), self.page_description)
 
+    def test_robots_are_inactive_without_whitelist(self):
+        page_extension = MetaTagPageExtension(extended_object=self.page, robots_indexing=True, robots_following=True)
+        page_extension.save()
+        self.page.publish('en')
+        response = self.client.get('/')
+        content = PyQuery(response.content)
+        self.assertEqual(content.find('meta[name="robots"]').attr('content'), 'noindex, nofollow')
+
+    @override_settings(META_TAGGER_ROBOTS_DOMAIN_WHITELIST=['testserver'])
     def test_robots_are_active(self):
         page_extension = MetaTagPageExtension(extended_object=self.page, robots_indexing=True, robots_following=True)
         page_extension.save()
@@ -123,6 +133,7 @@ class PageMetaTagTests(MetaTaggerViewTestMixin):
         content = PyQuery(response.content)
         self.assertEqual(content.find('meta[name="robots"]').attr('content'), 'index, follow')
 
+    @override_settings(META_TAGGER_ROBOTS_DOMAIN_WHITELIST=['testserver'])
     def test_robots_are_inactive(self):
         page_extension = MetaTagPageExtension(extended_object=self.page, robots_indexing=False, robots_following=False)
         page_extension.save()
@@ -171,12 +182,20 @@ class ModelMetaTagTests(MetaTaggerViewTestMixin):
         content = PyQuery(response.content)
         self.assertEqual(content.find('meta[name="description"]').attr('content'), self.page_description)
 
+    def test_robots_are_inactive_without_whitelist(self):
+        news_article = NewsArticle.objects.create(title='My title', robots_indexing=True, robots_following=True)
+        response = self.client.get(reverse('news-article-detail', kwargs={'pk': news_article.pk}))
+        content = PyQuery(response.content)
+        self.assertEqual(content.find('meta[name="robots"]').attr('content'), 'noindex, nofollow')
+
+    @override_settings(META_TAGGER_ROBOTS_DOMAIN_WHITELIST=['testserver'])
     def test_robots_are_active(self):
         news_article = NewsArticle.objects.create(title='My title', robots_indexing=True, robots_following=True)
         response = self.client.get(reverse('news-article-detail', kwargs={'pk': news_article.pk}))
         content = PyQuery(response.content)
         self.assertEqual(content.find('meta[name="robots"]').attr('content'), 'index, follow')
 
+    @override_settings(META_TAGGER_ROBOTS_DOMAIN_WHITELIST=['testserver'])
     def test_robots_are_inactive(self):
         news_article = NewsArticle.objects.create(title='My title', robots_indexing=False, robots_following=False)
         response = self.client.get(reverse('news-article-detail', kwargs={'pk': news_article.pk}))
