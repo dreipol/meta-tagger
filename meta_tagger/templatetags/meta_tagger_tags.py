@@ -93,7 +93,9 @@ def render_robots_meta_tag(context):
     robots_indexing = None
     robots_following = None
 
-    if not settings.DEBUG:
+    # Prevent indexing any unwanted domains (e.g. staging).
+    if context.request.get_host() in settings.META_TAGGER_ROBOTS_DOMAIN_WHITELIST:
+
         # Try to get the title from the context object (e.g. DetailViews).
         if context.get('object'):
             try:

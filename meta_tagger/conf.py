@@ -13,3 +13,5 @@ class MyAppConf(AppConf):
         'META_OG_IMAGE_WIDTH': 1200,
         'META_OG_IMAGE_HEIGHT': 630,
     }
+
+    ROBOTS_DOMAIN_WHITELIST = []

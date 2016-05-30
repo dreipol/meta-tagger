@@ -86,6 +86,8 @@ To populate the global meta tags with values, just add the following lines to yo
         'META_TYPE': 'website',
     }
 
+    META_TAGGER_ROBOTS_DOMAIN_WHITELIST = ['www.example.com']
+
 
 Dynamic settings
 ----------------
@@ -120,7 +122,18 @@ Configure installed apps in your ``settings.py`` ::
         'META_OG_IMAGE_HEIGHT': (630, '<meta property="og:image:height" content="{META_OG_IMAGE_HEIGHT}">', int),
     }
 
+    META_TAGGER_ROBOTS_DOMAIN_WHITELIST = ['www.example.com']
+
 Please refer to the documentation of django constance for additional installation support (e.g. Redis)
+
+
+ROBOTS INDEXING
+---------------
+
+To prevent indexing any unwanted domains, the content of the robots meta tag defaults to ``noindex, nofollow``. All
+domains listed in the setting variable use the configuration of your model instance or CMS page::
+
+    META_TAGGER_ROBOTS_DOMAIN_WHITELIST = ['www.example.com']
 
 
 Running Tests
