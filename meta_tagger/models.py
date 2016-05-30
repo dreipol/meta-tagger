@@ -24,6 +24,12 @@ class MetaTagBaseMixin(models.Model):
     def get_og_image(self):
         return getattr(self, 'og_image', None)
 
+    def get_og_image_width(self):
+        return getattr(self, 'og_image_width', None)
+
+    def get_og_image_height(self):
+        return getattr(self, 'og_image_height', None)
+
 
 class MetaTagTitleDescriptionMixin(MetaTagBaseMixin):
     meta_title = models.CharField(max_length=255, blank=True, verbose_name=_('Meta title'))
@@ -43,6 +49,8 @@ class RobotsMixin(MetaTagBaseMixin):
 
 class OpenGraphMixin(MetaTagBaseMixin):
     og_image = FilerImageField(blank=True, null=True, verbose_name=_('Open Graph image'))
+    og_image_width = models.PositiveIntegerField(blank=True, null=True, verbose_name=_('Open Graph image width'))
+    og_image_height = models.PositiveIntegerField(blank=True, null=True, verbose_name=_('Open Graph image height'))
 
     class Meta:
         abstract = True

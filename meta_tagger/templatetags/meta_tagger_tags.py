@@ -1,5 +1,7 @@
 from django import template
+from easy_thumbnails.files import get_thumbnailer
 
+from meta_tagger.helpers import get_setting_variable
 from meta_tagger.models import MetaTagPageExtension
 
 from ..conf import settings
@@ -9,16 +11,7 @@ register = template.Library()
 
 @register.simple_tag
 def render_global_meta_tag(tag_name, is_og=False):
-    setting_key = 'META_{}'.format(tag_name.upper())
-
-    try:
-        # Try to get the settings from constance.
-        from constance import config as meta_tag_config
-        content = getattr(meta_tag_config, setting_key)
-    except ImportError:
-        # If constance is not installed, we use the settings in conf.py as fallback.
-        meta_tag_config = settings.META_TAGGER_META_TAG_CONF
-        content = meta_tag_config.get(setting_key)
+    content = get_setting_variable(name='META_{}'.format(tag_name.upper()))
 
     if content:
         return '<meta {attr_name}="{tag_name}" content="{content}">'.format(
@@ -128,11 +121,15 @@ def render_robots_meta_tag(context):
 def render_image_meta_tag(context):
     request = context['request']
     og_image = None
+    og_image_width = None
+    og_image_height = None
 
     # Try to get the image from the context object (e.g. DetailView).
     if context.get('object'):
         try:
             og_image = context['object'].get_og_image()
+            og_image_width = context['object'].get_og_image_width()
+            og_image_height = context['object'].get_og_image_height()
         except AttributeError:
             pass
 
@@ -144,6 +141,44 @@ def render_image_meta_tag(context):
             pass
 
     if og_image:
-        return '<meta property="og:image" content="{content}">'.format(content=og_image.file.url)
+
+        if not og_image_width:
+            try:
+                # Try fetching the image width of the cms page.
+                og_image_width = request.current_page.metatagpageextension.og_image_width
+            except MetaTagPageExtension.DoesNotExist:
+                pass
+
+            if not og_image_width:
+                # Use the default from the settings.
+                og_image_width = get_setting_variable(name='META_OG_IMAGE_WIDTH')
+
+        if not og_image_height:
+            try:
+                # Try fetching the image height of the cms page.
+                og_image_height = request.current_page.metatagpageextension.og_image_height
+            except MetaTagPageExtension.DoesNotExist:
+                pass
+
+            if not og_image_height:
+                # Use the default from the settings.
+                og_image_height = get_setting_variable(name='META_OG_IMAGE_HEIGHT')
+
+        # Create a thumbnail to get the absolute url.
+        thumbnailer_options = {'size': (og_image_width, og_image_height), 'crop': True}
+        thumbnail = get_thumbnailer(og_image).get_thumbnail(thumbnailer_options)
+
+        # Depending on the storage backend we have to prefix the url with the scheme and the host.
+        if thumbnail.url[:4] == 'http':
+            url = thumbnail.url
+        else:
+            url = '{scheme}://{host}{path}'.format(scheme=context.request.scheme, host=context.request.get_host(),
+                                                   path=thumbnail.url)
+
+        image_tag = '<meta property="og:image" content="{content}">'.format(content=url)
+        width_tag = '<meta property="og:image:width" content="{content}">'.format(content=og_image_width)
+        height_tag = '<meta property="og:image:height" content="{content}">'.format(content=og_image_height)
+        return image_tag + width_tag + height_tag
+
     else:
         return ''

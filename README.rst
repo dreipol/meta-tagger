@@ -116,6 +116,8 @@ Configure installed apps in your ``settings.py`` ::
         'META_COMPANY': ('', '<meta name="company" content="{META_COMPANY}">', 'short_text'),
         'META_SITE_NAME': ('', '<meta name="site-name" content="{META_SITE_NAME}">', 'short_text'),
         'META_TYPE': ('website', '<meta property="og:type" content="{META_TYPE}">', 'short_text'),
+        'META_OG_IMAGE_WIDTH': (1200, '<meta property="og:image:width" content="{META_OG_IMAGE_WIDTH}">', int),
+        'META_OG_IMAGE_HEIGHT': (630, '<meta property="og:image:height" content="{META_OG_IMAGE_HEIGHT}">', int),
     }
 
 Please refer to the documentation of django constance for additional installation support (e.g. Redis)

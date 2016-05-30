@@ -10,4 +10,6 @@ class MyAppConf(AppConf):
         'META_COMPANY': '',
         'META_SITE_NAME': '',
         'META_TYPE': '',
+        'META_OG_IMAGE_WIDTH': 1200,
+        'META_OG_IMAGE_HEIGHT': 630,
     }

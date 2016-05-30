@@ -57,6 +57,7 @@ setup(
         'django-cms>=3.0',
         'django-filer>=1.1.0',
         'django-appconf>=1.0.1',
+        'easy-thumbnails>=2.2',
     ],
     license="BSD",
     zip_safe=False,
