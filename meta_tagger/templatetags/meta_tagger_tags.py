@@ -110,7 +110,7 @@ def render_robots_meta_tag(context):
                 robots_indexing = request.current_page.metatagpageextension.robots_indexing
             if robots_following is None:
                 robots_following = request.current_page.metatagpageextension.robots_following
-        except MetaTagPageExtension.DoesNotExist:
+        except (AttributeError, MetaTagPageExtension.DoesNotExist):
             pass
 
     return '<meta name="robots" content="{robots_indexing}, {robots_following}">'.format(
@@ -139,7 +139,7 @@ def render_image_meta_tag(context):
         try:
             # Try fetching the image of the cms page.
             og_image = request.current_page.metatagpageextension.og_image
-        except MetaTagPageExtension.DoesNotExist:
+        except (AttributeError, MetaTagPageExtension.DoesNotExist):
             pass
 
     if og_image:
@@ -148,7 +148,7 @@ def render_image_meta_tag(context):
             try:
                 # Try fetching the image width of the cms page.
                 og_image_width = request.current_page.metatagpageextension.og_image_width
-            except MetaTagPageExtension.DoesNotExist:
+            except (AttributeError, MetaTagPageExtension.DoesNotExist):
                 pass
 
             if not og_image_width:
@@ -159,7 +159,7 @@ def render_image_meta_tag(context):
             try:
                 # Try fetching the image height of the cms page.
                 og_image_height = request.current_page.metatagpageextension.og_image_height
-            except MetaTagPageExtension.DoesNotExist:
+            except (AttributeError, MetaTagPageExtension.DoesNotExist):
                 pass
 
             if not og_image_height:
