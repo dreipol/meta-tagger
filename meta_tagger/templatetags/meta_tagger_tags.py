@@ -1,4 +1,5 @@
 from django import template
+from django.utils.safestring import mark_safe
 from easy_thumbnails.files import get_thumbnailer
 
 from meta_tagger.helpers import get_setting_variable
@@ -14,11 +15,11 @@ def render_global_meta_tag(tag_name, is_og=False):
     content = get_setting_variable(name='META_{}'.format(tag_name.upper()))
 
     if content:
-        return '<meta {attr_name}="{tag_name}" content="{content}">'.format(
+        return mark_safe('<meta {attr_name}="{tag_name}" content="{content}">'.format(
             attr_name='name' if not is_og else 'property',
             tag_name=tag_name if not is_og else 'og:{}'.format(tag_name),
             content=content
-        )
+        ))
     return ''
 
 
@@ -49,7 +50,7 @@ def render_title_tag(context, is_og=False):
     if not is_og:
         return content
     else:
-        return '<meta property="og:title" content="{content}">'.format(content=content)
+        return mark_safe('<meta property="og:title" content="{content}">'.format(content=content))
 
 
 @register.simple_tag(takes_context=True)
@@ -75,11 +76,11 @@ def render_description_meta_tag(context, is_og=False):
             pass
 
     if content:
-        return '<meta {attr_name}="{tag_name}" content="{content}">'.format(
+        return mark_safe('<meta {attr_name}="{tag_name}" content="{content}">'.format(
             attr_name='name' if not is_og else 'property',
             tag_name='description' if not is_og else 'og:description',
             content=content
-        )
+        ))
     else:
         return ''
 
@@ -113,10 +114,10 @@ def render_robots_meta_tag(context):
         except (AttributeError, MetaTagPageExtension.DoesNotExist):
             pass
 
-    return '<meta name="robots" content="{robots_indexing}, {robots_following}">'.format(
+    return mark_safe('<meta name="robots" content="{robots_indexing}, {robots_following}">'.format(
         robots_indexing='index' if robots_indexing else 'noindex',
         robots_following='follow' if robots_following else 'nofollow'
-    )
+    ))
 
 
 @register.simple_tag(takes_context=True)
@@ -180,7 +181,7 @@ def render_image_meta_tag(context):
         image_tag = '<meta property="og:image" content="{content}">'.format(content=url)
         width_tag = '<meta property="og:image:width" content="{content}">'.format(content=og_image_width)
         height_tag = '<meta property="og:image:height" content="{content}">'.format(content=og_image_height)
-        return image_tag + width_tag + height_tag
+        return mark_safe(image_tag + width_tag + height_tag)
 
     else:
         return ''
