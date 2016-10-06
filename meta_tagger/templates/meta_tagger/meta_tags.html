@@ -1,16 +1,16 @@
 {% load meta_tagger_tags %}
 
-{% render_description_meta_tag %}
-{% render_global_meta_tag 'author' %}
-{% render_global_meta_tag 'publisher' %}
-{% render_global_meta_tag 'copyright' %}
-{% render_global_meta_tag 'company' %}
-{% render_robots_meta_tag %}
+{% block meta_description %}{% render_description_meta_tag %}{% endblock %}
+{% block meta_author %}{% render_global_meta_tag 'author' %}{% endblock %}
+{% block meta_publisher %}{% render_global_meta_tag 'publisher' %}{% endblock %}
+{% block meta_copyright %}{% render_global_meta_tag 'copyright' %}{% endblock %}
+{% block meta_company %}{% render_global_meta_tag 'company' %}{% endblock %}
+{% block meta_robots %}{% render_robots_meta_tag %}{% endblock %}
 
 {# open-graph tags #}
-{% render_title_tag True %}
-{% render_description_meta_tag True %}
-{% render_image_meta_tag %}
-{% render_global_meta_tag 'site_name' True %}
-{% render_global_meta_tag 'type' True %}
-<meta property="og:url" content="{{ request.build_absolute_uri }}">
+{% block og_title %}{% render_title_tag True %}{% endblock %}
+{% block og_description %}{% render_description_meta_tag True %}{% endblock %}
+{% block og_image %}{% render_image_meta_tag %}{% endblock %}
+{% block og_site_name %}{% render_global_meta_tag 'site_name' True %}{% endblock %}
+{% block og_type %}{% render_global_meta_tag 'type' True %}{% endblock %}
+{% block url %}<meta property="og:url" content="{{ request.build_absolute_uri }}">{% endblock %}
