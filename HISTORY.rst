@@ -3,6 +3,12 @@
 History
 -------
 
+0.1.4 (2016-10-06)
+++++++++++++++++++
+
+* Wrap block tags to allow template overrides
+
+
 0.1.3 (2016-08-25)
 ++++++++++++++++++
 
