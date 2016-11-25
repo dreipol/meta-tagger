@@ -1,6 +1,8 @@
 from django import template
+from django.core.urlresolvers import NoReverseMatch
+from django.db.models.fields.files import FieldFile
 from django.utils.safestring import mark_safe
-from easy_thumbnails.files import get_thumbnailer
+from easy_thumbnails.files import get_thumbnailer, Thumbnailer
 
 from meta_tagger.helpers import get_setting_variable
 from meta_tagger.models import MetaTagPageExtension
@@ -37,6 +39,8 @@ def render_title_tag(context, is_og=False):
             content = context['object'].get_meta_title()
         except AttributeError:
             pass
+    elif context.get('meta_tagger'):
+        content = context['meta_tagger'].get('title')
 
     if not content:
         # Try to get the title from the cms page.
@@ -44,7 +48,7 @@ def render_title_tag(context, is_og=False):
             content = request.current_page.get_page_title()  # Try the `page_title` before the `title of the CMS page.
             if not content:
                 content = request.current_page.get_title()
-        except AttributeError:
+        except (AttributeError, NoReverseMatch):
             pass
 
     if not is_og:
@@ -67,12 +71,14 @@ def render_description_meta_tag(context, is_og=False):
             content = context['object'].get_meta_description()
         except AttributeError:
             pass
+    elif context.get('meta_tagger'):
+        content = context['meta_tagger'].get('description')
 
     if not content:
         try:
             # Try for the meta description of the cms page.
             content = request.current_page.get_meta_description()
-        except AttributeError:
+        except (AttributeError, NoReverseMatch):
             pass
 
     if content:
@@ -104,6 +110,9 @@ def render_robots_meta_tag(context):
                 robots_following = context['object'].get_robots_following()
             except AttributeError:
                 pass
+        elif context.get('meta_tagger'):
+            robots_indexing = context['meta_tagger'].get('robots_indexing', robots_indexing)
+            robots_following = context['meta_tagger'].get('robots_following', robots_following)
 
         try:
             # Try fetching the robots values of the cms page.
@@ -111,7 +120,7 @@ def render_robots_meta_tag(context):
                 robots_indexing = request.current_page.metatagpageextension.robots_indexing
             if robots_following is None:
                 robots_following = request.current_page.metatagpageextension.robots_following
-        except (AttributeError, MetaTagPageExtension.DoesNotExist):
+        except (AttributeError, NoReverseMatch, MetaTagPageExtension.DoesNotExist):
             pass
 
     return mark_safe('<meta name="robots" content="{robots_indexing}, {robots_following}">'.format(
@@ -135,12 +144,16 @@ def render_image_meta_tag(context):
             og_image_height = context['object'].get_og_image_height()
         except AttributeError:
             pass
+    elif context.get('meta_tagger'):
+        og_image = context['meta_tagger'].get('og_image')
+        og_image_width = context['meta_tagger'].get('og_image_width')
+        og_image_height = context['meta_tagger'].get('og_image_height')
 
     if not og_image:
         try:
             # Try fetching the image of the cms page.
             og_image = request.current_page.metatagpageextension.og_image
-        except (AttributeError, MetaTagPageExtension.DoesNotExist):
+        except (AttributeError, NoReverseMatch, MetaTagPageExtension.DoesNotExist):
             pass
 
     if og_image:
@@ -149,7 +162,7 @@ def render_image_meta_tag(context):
             try:
                 # Try fetching the image width of the cms page.
                 og_image_width = request.current_page.metatagpageextension.og_image_width
-            except (AttributeError, MetaTagPageExtension.DoesNotExist):
+            except (AttributeError, NoReverseMatch, MetaTagPageExtension.DoesNotExist):
                 pass
 
             if not og_image_width:
@@ -160,7 +173,7 @@ def render_image_meta_tag(context):
             try:
                 # Try fetching the image height of the cms page.
                 og_image_height = request.current_page.metatagpageextension.og_image_height
-            except (AttributeError, MetaTagPageExtension.DoesNotExist):
+            except (AttributeError, NoReverseMatch, MetaTagPageExtension.DoesNotExist):
                 pass
 
             if not og_image_height:
@@ -169,7 +182,13 @@ def render_image_meta_tag(context):
 
         # Create a thumbnail to get the absolute url.
         thumbnailer_options = {'size': (og_image_width, og_image_height), 'crop': True}
-        thumbnail = get_thumbnailer(og_image).get_thumbnail(thumbnailer_options)
+
+        if hasattr(og_image, 'easy_thumbnails_thumbnailer') or isinstance(og_image, (FieldFile, Thumbnailer)):
+            thumbnailer = get_thumbnailer(og_image)
+        else:
+            thumbnailer = get_thumbnailer(og_image, relative_name='sharing_image')
+
+        thumbnail = thumbnailer.get_thumbnail(thumbnailer_options)
 
         # Depending on the storage backend we have to prefix the url with the scheme and the host.
         if thumbnail.url[:4] == 'http':
