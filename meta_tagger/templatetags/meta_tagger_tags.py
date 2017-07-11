@@ -114,14 +114,18 @@ def render_robots_meta_tag(context):
             robots_indexing = context['meta_tagger'].get('robots_indexing', robots_indexing)
             robots_following = context['meta_tagger'].get('robots_following', robots_following)
 
-        try:
-            # Try fetching the robots values of the cms page.
-            if robots_indexing is None:
+        # Try fetching the robots values of the cms page.
+        if robots_indexing is None:
+            try:
                 robots_indexing = request.current_page.metatagpageextension.robots_indexing
-            if robots_following is None:
+            except (AttributeError, NoReverseMatch, MetaTagPageExtension.DoesNotExist):
+                robots_indexing = True
+
+        if robots_following is None:
+            try:
                 robots_following = request.current_page.metatagpageextension.robots_following
-        except (AttributeError, NoReverseMatch, MetaTagPageExtension.DoesNotExist):
-            pass
+            except (AttributeError, NoReverseMatch, MetaTagPageExtension.DoesNotExist):
+                robots_following = True
 
     return mark_safe('<meta name="robots" content="{robots_indexing}, {robots_following}">'.format(
         robots_indexing='index' if robots_indexing else 'noindex',
