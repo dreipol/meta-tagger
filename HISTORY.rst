@@ -3,6 +3,26 @@
 History
 -------
 
+0.1.7 (2018-11-08)
+++++++++++++++++++
+
+* Add view for robots.txt
+* Introduce disallow field
+* Add some German translations
+
+
+0.1.6 (2017-07-11)
+++++++++++++++++++
+
+* Add default indexing
+
+
+0.1.5 (2016-11-25)
+++++++++++++++++++
+
+* Fix for setups without a CMS.
+
+
 0.1.5 (2016-11-25)
 ++++++++++++++++++
 
