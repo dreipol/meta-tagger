@@ -40,8 +40,15 @@ class MetaTagTitleDescriptionMixin(MetaTagBaseMixin):
 
 
 class RobotsMixin(MetaTagBaseMixin):
-    robots_indexing = models.BooleanField(default=True, verbose_name=_('Allow Indexing'))
-    robots_following = models.BooleanField(default=True, verbose_name=_('Allow Following'))
+    robots_indexing = models.BooleanField(default=True, verbose_name=_('Allow Indexing'),
+                                          help_text=_('Allows search engines to include this page in search results.'))
+    robots_following = models.BooleanField(default=True, verbose_name=_('Allow Following'),
+                                           help_text=_('Allows search engines to follow the links on this page.'))
+    robots_disallow = models.BooleanField(default=False, verbose_name=_('Disallow'),
+                                          help_text=_("Adds this page with the 'Disallow' instruction to the "
+                                                      "robots.txt file. Search engines won't crawl it. Consider "
+                                                      "deactivating the indexing checkbox above to prevent indexing "
+                                                      "too."))
 
     class Meta:
         abstract = True
@@ -61,6 +68,7 @@ class MetaTagMixin(MetaTagTitleDescriptionMixin, RobotsMixin, OpenGraphMixin):
     Use this mixin for your models if you want to make them ready for SEO and social sharing. Make sure you don't
     forget to implement your translation settings before you create your project migrations.
     """
+
     class Meta:
         abstract = True
 
@@ -68,5 +76,6 @@ class MetaTagMixin(MetaTagTitleDescriptionMixin, RobotsMixin, OpenGraphMixin):
 class MetaTagPageExtension(OpenGraphMixin, RobotsMixin, PageExtension):
     class Meta:
         verbose_name = 'Meta Tag'
+
 
 extension_pool.register(MetaTagPageExtension)
