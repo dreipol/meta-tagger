@@ -1,0 +1,5 @@
+User-agent: *
+{% if sitemap_url %}Sitemap: {{ sitemap_url }}{% endif %}
+
+{% for page in pages %}{{ page.instruction}}: {{ page.path }}
+{% endfor %}
