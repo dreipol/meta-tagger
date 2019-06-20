@@ -1,3 +1,4 @@
+import pkg_resources
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
 from django.utils.translation import ugettext_lazy as _
@@ -16,4 +17,9 @@ class MetaTagPageExtensionToolbar(ExtensionToolbar):
             page_extension, url = self.get_page_extension_admin()
 
             if url:
-                current_page_menu.add_modal_item(_('Meta Tags'), url=url, disabled=not self.toolbar.edit_mode)
+                if pkg_resources.get_distribution("django-cms").version >= '3.6.0':
+                    disabled = not self.toolbar.edit_mode_active
+                else:
+                    disabled = not self.toolbar.edit_mode
+
+                current_page_menu.add_modal_item(_('Meta Tags'), url=url, disabled=disabled)
