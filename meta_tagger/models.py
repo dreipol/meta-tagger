@@ -55,7 +55,7 @@ class RobotsMixin(MetaTagBaseMixin):
 
 
 class OpenGraphMixin(MetaTagBaseMixin):
-    og_image = FilerImageField(blank=True, null=True, verbose_name=_('Open Graph image'))
+    og_image = FilerImageField(blank=True, null=True, on_delete=models.PROTECT, verbose_name=_('Open Graph image'))
     og_image_width = models.PositiveIntegerField(blank=True, null=True, verbose_name=_('Open Graph image width'))
     og_image_height = models.PositiveIntegerField(blank=True, null=True, verbose_name=_('Open Graph image height'))
 

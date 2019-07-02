@@ -1,11 +1,13 @@
 from django import template
-from django.core.urlresolvers import NoReverseMatch
 from django.db.models.fields.files import FieldFile
 from django.utils.safestring import mark_safe
 from easy_thumbnails.files import get_thumbnailer, Thumbnailer
-
 from meta_tagger.helpers import get_setting_variable
 from meta_tagger.models import MetaTagPageExtension
+try:
+    from django.urls import NoReverseMatch
+except ImportError:
+    from django.core.urlresolvers import NoReverseMatch  # Django version < 1.10
 
 from ..conf import settings
 
