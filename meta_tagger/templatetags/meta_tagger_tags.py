@@ -187,7 +187,7 @@ def render_image_meta_tag(context):
                 og_image_height = get_setting_variable(name='META_OG_IMAGE_HEIGHT')
 
         # Create a thumbnail to get the absolute url.
-        thumbnailer_options = {'size': (og_image_width, og_image_height), 'crop': True}
+        thumbnailer_options = {'size': (og_image_width, og_image_height), 'crop': True, 'HIGH_RESOLUTION': False}
 
         if hasattr(og_image, 'easy_thumbnails_thumbnailer') or isinstance(og_image, (FieldFile, Thumbnailer)):
             thumbnailer = get_thumbnailer(og_image)
