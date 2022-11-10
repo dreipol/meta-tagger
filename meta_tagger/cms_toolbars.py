@@ -1,7 +1,7 @@
 import pkg_resources
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from .models import MetaTagPageExtension
 
