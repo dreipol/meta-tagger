@@ -1,7 +1,7 @@
-import pkg_resources
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
 from django.utils.translation import gettext_lazy as _
+from pkg_resources import get_distribution, parse_version
 
 from .models import MetaTagPageExtension
 
@@ -17,7 +17,7 @@ class MetaTagPageExtensionToolbar(ExtensionToolbar):
             page_extension, url = self.get_page_extension_admin()
 
             if url:
-                if pkg_resources.get_distribution("django-cms").version >= '3.6.0':
+                if parse_version(get_distribution('django-cms').version) >= parse_version('3.6.0'):
                     disabled = not self.toolbar.edit_mode_active
                 else:
                     disabled = not self.toolbar.edit_mode
