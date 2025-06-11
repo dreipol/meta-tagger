@@ -1,7 +1,6 @@
 from contextlib import suppress
 
 from cms import __version__ as cms_version
-from cms.models import Title
 from django.contrib.sites.models import Site
 from django.contrib.sites.shortcuts import get_current_site
 from django.db.models import Q
@@ -22,23 +21,33 @@ class RobotsView(View):
         return render(request, 'meta_tagger/robots.txt', context, content_type='text/plain')
 
     @staticmethod
-    def get_page_title_queryset():
+    def get_page_content_queryset():
         site = Site.objects.get_current()
-        queryset = Title.objects.public().filter(Q(redirect='') | Q(redirect__isnull=True), page__login_required=False)
-        if parse_version(cms_version) > parse_version('3.5'):
-            return queryset.filter(page__node__site=site).order_by('page__node__path')
+        if parse_version(cms_version) >= parse_version("4.0"):
+            from cms.models import PageContent
+
+            return PageContent.objects.public().filter(
+                Q(redirect="") | Q(redirect__isnull=True), page__login_required=False
+            )
         else:
-            return queryset.filter(page__site=site).order_by('page__path')
+            from cms.models import Title
+
+            queryset = Title.objects.public().filter(
+                Q(redirect="") | Q(redirect__isnull=True), page__login_required=False
+            )
+            if parse_version(cms_version) > parse_version("3.5"):
+                return queryset.filter(page__node__site=site).order_by("page__node__path")
+            else:
+                return queryset.filter(page__site=site).order_by("page__path")
 
     def get_pages(self) -> list:
         pages = []
-        for title in self.get_page_title_queryset():
+        for page_content in self.get_page_content_queryset():
             with suppress(MetaTagPageExtension.DoesNotExist):
-                if title.page.metatagpageextension.robots_disallow:
-                    pages.append({
-                        'instruction': 'Disallow',
-                        'path': title.page.get_absolute_url(title.language)
-                    })
+                if page_content.page.metatagpageextension.robots_disallow:
+                    pages.append(
+                        {"instruction": "Disallow", "path": page_content.page.get_absolute_url(page_content.language)}
+                    )
         return pages
 
     def get_sitemap_url(self) -> str:
