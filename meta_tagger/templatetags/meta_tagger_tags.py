@@ -3,7 +3,7 @@ from django import template
 from django.db.models.fields.files import FieldFile
 from django.utils.safestring import mark_safe
 from easy_thumbnails.files import get_thumbnailer, Thumbnailer
-from pkg_resources import parse_version
+from packaging.version import Version
 
 from meta_tagger.helpers import get_setting_variable
 from meta_tagger.models import MetaTagPageExtension
@@ -53,7 +53,7 @@ def render_title_tag(context, is_og=False):
         try:
             content = request.current_page.get_page_title()  # Try the `page_title` before the `title of the CMS page.
             if not content:
-                if parse_version(cms_version) >= parse_version('4.0'):
+                if cms_version and Version(cms_version) >= Version('4.0'):
                     content = request.current_page.get_content_obj()
                 else:
                     content = request.current_page.get_title()
