@@ -7,7 +7,7 @@ from django.db.models import Q
 from django.shortcuts import render
 from django.urls import NoReverseMatch, reverse
 from django.views import View
-from pkg_resources import parse_version
+from packaging.version import Version
 
 from meta_tagger.models import MetaTagPageExtension
 
@@ -23,7 +23,7 @@ class RobotsView(View):
     @staticmethod
     def get_page_content_queryset():
         site = Site.objects.get_current()
-        if parse_version(cms_version) >= parse_version("4.0"):
+        if cms_version and Version(cms_version) >= Version("4.0"):
             from cms.models import PageContent
 
             return PageContent.objects.public().filter(
@@ -57,4 +57,4 @@ class RobotsView(View):
             return ''
         scheme = 'https' if self.request.is_secure() else 'http'
         site = get_current_site(self.request)
-        return '{scheme}://{site}{path}'.format(scheme=scheme, site=site, path=path)
+        return f"{scheme}://{site}{path}"

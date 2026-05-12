@@ -58,6 +58,7 @@ setup(
         'django-filer>=1.1.0',
         'django-appconf>=1.0.1',
         'easy-thumbnails>=2.2',
+        'packaging>=21.0',
     ],
     license="BSD",
     zip_safe=False,
