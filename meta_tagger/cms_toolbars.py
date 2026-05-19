@@ -2,6 +2,7 @@ from cms import __version__ as cms_version
 from cms.extensions.toolbar import ExtensionToolbar
 from cms.toolbar_pool import toolbar_pool
 from django.utils.translation import gettext_lazy as _
+from packaging.version import Version
 
 from .models import MetaTagPageExtension
 
